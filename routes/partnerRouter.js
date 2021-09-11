@@ -1,15 +1,17 @@
 const express = require('express');
 const partnerRouter = express.Router();
+const Partner = require('../models/partner');
 const authenticate = require('../authenticate');
 
 partnerRouter.route('/')
-.all((req, res, next) => {
-    res.statusCode = 200;
-    res.setHeader('Content-Type', 'text/html');
-    next();
-})
-.get((req, res) => {
-    res.end('Will send all the partners to you')
+.get((req, res, next) => {
+    Partner.find()
+    .then(partners => {
+        res.statusCode = 200;
+        res.setHeader('Content-Type', 'application/json');
+        res.json(partners);
+    })
+    .catch(err => next(err));
 })
 .post(authenticate.verifyUser, (req, res) => {
     res.end(`Will add the partners: ${req.body.name} with description: ${req.body.description}.`)
